@@ -8,7 +8,7 @@
  regexp : true, sloppy  : true, vars     : false,
  white  : true
  */
-/*global $, spa, getComputedStyle */
+/*global $, spa */
 
 spa.chat = (function() {
   //---------------- BEGIN MODULE SCOPE VARIABLES --------------
@@ -44,11 +44,9 @@ spa.chat = (function() {
         set_chat_anchor : true
       },
 
-      slider_open_time     : 250,
-      slider_close_time    : 250,
-      slider_opened_em     : 18,
-      slider_opened_min_em : 10,
-      window_height_min_em : 20,
+      slider_open_time  : 250,
+      slider_close_time : 250,
+      slider_opened_em  : 16,
 
       slider_closed_em    : 2,
       slider_opened_title : 'Click to close',
@@ -68,9 +66,8 @@ spa.chat = (function() {
     },
     jqueryMap = {},
 
-    setJqueryMap,      getEmSize,     setPxSizes,
-    setSliderPosition, onClickToggle, configModule,
-    initModule,        removeSlider,  handleResize;
+    setJqueryMap, getEmSize, setPxSizes, setSliderPosition,
+    onClickToggle, configModule, initModule;
   //----------------- END MODULE SCOPE VARIABLES ---------------
 
   //------------------- BEGIN UTILITY METHODS ------------------
@@ -103,17 +100,10 @@ spa.chat = (function() {
 
   // Begin DOM method /setPxSizes/
   setPxSizes = function () {
-    var px_per_em, window_height_em, opened_height_em;
-
+    var px_per_em, opened_height_em;
     px_per_em = getEmSize( jqueryMap.$slider.get(0) );
-    window_height_em = Math.floor(
-      ( $(window).height() / px_per_em ) + 0.5
-    );
 
-    opened_height_em
-      = window_height_em > configMap.window_height_min_em
-      ? configMap.slider_opened_em
-      : configMap.slider_opened_min_em;
+    opened_height_em = configMap.slider_opened_em;
 
     stateMap.px_per_em = px_per_em;
     stateMap.slider_closed_px = configMap.slider_closed_em * px_per_em;
@@ -225,9 +215,9 @@ spa.chat = (function() {
   //             unacceptable or missing arguments
   configModule = function (input_map) {
     spa.util.setConfigMap({
-      input_map    : input_map,
-      settable_map : configMap.settable_map,
-      config_map   : configMap
+      input_map: input_map,
+      settable_map: configMap.settable_map,
+      configMap: configMap
     });
     return true;
   };
@@ -262,64 +252,11 @@ spa.chat = (function() {
   };
   // End public method /initModule/
 
-  // Begin public method /removeSlider/
-  // Purpose :
-  //   * Removes chatSlider DOM element
-  //   * Reverts to initial state
-  //   * Removes pointers to callbacks and other data
-  // Arguments : none
-  // Returns   : true
-  // Throws    : none
-  removeSlider = function() {
-    // Unwind initialization and state.
-    // Remove DOM container and event bindings
-    if (jqueryMap.$slider) {
-      jqueryMap.$slider.remove();
-      jqueryMap = {};
-    }
-    stateMap.$append_target = null;
-    stateMap.position_type  = null;
-
-    // unwind key configurations
-    configMap.chat_model      = null;
-    configMap.people_model    = null;
-    configMap.set_chat_anchor = null;
-
-    return true;
-  };
-  // end public method /removeSlider/
-
-  // Begin public method /handleResize/
-  // Purpose    :
-  //   Given a window resize event, adjust the presentation
-  //   provided by this module if needed
-  // Actions    :
-  //   If the window height or width falls below
-  //   a given threshold, resize the chat slider for the
-  //   reduced window size.
-  // Returns    : Boolean
-  //   * false - resize not considered
-  //   * true  - resize considered
-  // Throws     : none
-  handleResize = function() {
-    // don't do anything if no slider container
-    if (!jqueryMap.$slider) {return false;}
-
-    setPxSizes();
-    if (stateMap.position_type === 'opened') {
-      jqueryMap.$slider.css({ height: stateMap.slider_opened_px });
-    }
-    return true;
-  };
-  // End public method /handleResize/
-
   // return public methods
   return {
     setSliderPosition : setSliderPosition,
-    configModule      : configModule,
-    initModule        : initModule,
-    removeSlider      : removeSlider,
-    handleResize      : handleResize
+    configModule: configModule,
+    initModule: initModule
   };
   //------------------- END PUBLIC METHODS ---------------------
 }());
